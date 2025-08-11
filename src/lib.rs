@@ -35,31 +35,13 @@ impl Letters {
         Ok(letters)
     }
 
-    fn validate(input: &str) -> MCLResult<()> {
-        if !input.is_ascii() {
-            return Err(MarkovChainLettersError::NotAsciiError);
-        }
-        for c in input.chars() {
-            if !c.is_ascii_alphabetic() {
-                if c.is_ascii_digit() {
-                    return Err(MarkovChainLettersError::CharacterIsNumberError(c))
-                } else {
-                    return Err(MarkovChainLettersError::NotAsciiAlphabeticError(c))
-                }
-            }
-        }
-
-        Ok(())
-    }
-
-    // TODO: maybe just dilter for alphebetic
+    /// non ascii characters will simply get removed, all characters will be made lowercase
     pub fn normalize(input: &str) -> String {
-        input.chars().filter(|c| !c.is_ascii_whitespace()).filter(|c| !c.is_ascii_punctuation()).collect()
+        input.chars().filter(|c| c.is_ascii_alphabetic()).map(|c| c.to_ascii_lowercase()).collect()
     }
 
     pub fn update(&mut self, input: &str) -> MCLResult<()> {
         let input = Letters::normalize(input);
-        Letters::validate(&input)?;
         let letters: Vec<Letter> = input.chars().map(|c| match c {
             // Safety: See validate check above
             'a' | 'e' | 'i' | 'o' | 'u' => Letter::Vowel,
@@ -127,7 +109,7 @@ enum NextLetterChance {
         c: f64
     }
 }
-
+/* 
 pub struct PredictionMachine {
     chances: NextLetterChance,
 }
@@ -136,7 +118,7 @@ impl PredictionMachine {
     pub fn from_stats(consonants_count: usize, vowels_count: usize, pairs: LetterPairs) -> PredictionMachine {
         
     }
-}
+}*/
 
 pub type MCLResult<T> = Result<T, MarkovChainLettersError>;
 
